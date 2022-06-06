@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>socket 4</title>
+</head>
+<body>
+
+<input type="text" id="i1">
+<button onclick="b1()">Join ROOM</button>
+<button onclick="b2()">Send Message</button>
+<p id="demo"></p>
+
+<script src="/socket.io/socket.io.js"></script>
+
+<script>
+// set-up a connection between the client and the server
+var socket = io();
+
+var x = document.getElementById("demo");
+
+function getLocation() {
+  if (navigator.geolocation) {
+    navigator.geolocation.watchPosition(showPosition);
+  } else {
+    x.innerHTML = "Geolocation is not supported by this browser.";
+  }
+}
+
+function showPosition(position) {
+  x.innerHTML = "Latitude: " + position.coords.latitude +
+  "<br>Longitude: " + position.coords.longitude;
+  socket.emit('s my ll', {gname: sessionStorage.getItem("loggedin_gname"),uname: sessionStorage.getItem("loggedin_uname"),lat: position.coords.latitude,lng: position.coords.longitude});
+}
+
+function b1(){
+   var i1 = document.getElementById("i1").value;
+   const room = i1;
+   socket.emit('room', room);
+}
+
+function b2(){
+   var i1 = document.getElementById("i1").value;
+   socket.emit('message', i1);
+}
+
+socket.on('some event', function(data) {
+   console.log('you are connected to :', data);
+   getLocation();
+});
+
+socket.on('message', function(data) {
+   console.log(data);
+});
+socket.on('location', function(data) {
+   console.log(data);
+});
+</script>
+
+</body>
+</html>
